@@ -1,0 +1,113 @@
+[gd_resource type="VisualShader" load_steps=9 format=3 uid="uid://bju6i804iw06o"]
+
+[ext_resource type="Script" path="res://com.naelstrof.shaders/Matcap.cs" id="1_uytw0"]
+
+[sub_resource type="VisualShaderNodeCustom" id="VisualShaderNodeCustom_eh2xq"]
+initialized = true
+script = ExtResource("1_uytw0")
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_nvkrk"]
+parameter_name = "MatCapSphereTexture"
+texture_type = 1
+color_default = 1
+
+[sub_resource type="VisualShaderNodeVaryingGetter" id="VisualShaderNodeVaryingGetter_vaqfg"]
+varying_name = "world_vert_normal"
+varying_type = 4
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_bqbc1"]
+input_name = "normal"
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_rxxor"]
+input_name = "modelview_matrix"
+
+[sub_resource type="VisualShaderNodeTransformVecMult" id="VisualShaderNodeTransformVecMult_o72qb"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeVaryingSetter" id="VisualShaderNodeVaryingSetter_gi7qo"]
+varying_name = "world_vert_normal"
+varying_type = 4
+
+[resource]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+
+// Varyings
+varying vec3 world_vert_normal;
+
+uniform sampler2D MatCapSphereTexture : source_color, hint_default_black;
+
+
+// Matcap
+
+void GetOrthoNormalized(inout vec3 a, inout vec3 b, out vec3 c) {
+	a = normalize(a);
+	c = normalize(cross(a, b));
+	b = cross(c, a);
+}
+vec4 GetMatCap(sampler2D mat, vec3 vertToView, vec3 viewUp, vec3 worldNormal) {
+	vec3 c;
+	GetOrthoNormalized(vertToView, viewUp, c);
+	float dotA = dot(viewUp, worldNormal);
+	float dotB = dot(c, worldNormal);
+	vec2 uv = vec2(0.5,0.5)+vec2(0.5,0.5)*vec2(dotA,dotB);
+	return texture(mat,uv);
+}
+
+
+void vertex() {
+// Input:3
+	mat4 n_out3p0 = MODELVIEW_MATRIX;
+
+
+// Input:2
+	vec3 n_out2p0 = NORMAL;
+
+
+// TransformVectorMult:4
+	vec3 n_out4p0 = (n_out3p0 * vec4(n_out2p0, 0.0)).xyz;
+
+
+// VaryingSetter:5
+	world_vert_normal = n_out4p0;
+
+
+}
+
+void fragment() {
+// VaryingGetter:5
+	vec3 n_out5p0 = world_vert_normal;
+
+
+	vec4 n_out2p0;
+// Matcap:2
+	{
+		n_out2p0 = GetMatCap(MatCapSphereTexture,-VIEW, (VIEW_MATRIX*vec4(0,1,0,0)).xyz, n_out5p0);
+	}
+
+
+// Output:0
+	EMISSION = vec3(n_out2p0.xyz);
+
+
+}
+"
+varyings/world_vert_normal = "0,4"
+nodes/vertex/0/position = Vector2(580, 140)
+nodes/vertex/2/node = SubResource("VisualShaderNodeInput_bqbc1")
+nodes/vertex/2/position = Vector2(-480, 520)
+nodes/vertex/3/node = SubResource("VisualShaderNodeInput_rxxor")
+nodes/vertex/3/position = Vector2(-480, 380)
+nodes/vertex/4/node = SubResource("VisualShaderNodeTransformVecMult_o72qb")
+nodes/vertex/4/position = Vector2(-140, 380)
+nodes/vertex/5/node = SubResource("VisualShaderNodeVaryingSetter_gi7qo")
+nodes/vertex/5/position = Vector2(208.163, 411.201)
+nodes/vertex/connections = PackedInt32Array(3, 0, 4, 0, 2, 0, 4, 1, 4, 0, 5, 0)
+nodes/fragment/2/node = SubResource("VisualShaderNodeCustom_eh2xq")
+nodes/fragment/2/position = Vector2(-160, 340)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture2DParameter_nvkrk")
+nodes/fragment/3/position = Vector2(-840, 160)
+nodes/fragment/5/node = SubResource("VisualShaderNodeVaryingGetter_vaqfg")
+nodes/fragment/5/position = Vector2(-460, 480)
+nodes/fragment/connections = PackedInt32Array(3, 0, 2, 0, 5, 0, 2, 1, 2, 0, 0, 5)

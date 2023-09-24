@@ -1,0 +1,109 @@
+[gd_scene load_steps=12 format=3 uid="uid://dgvysaeasl6f0"]
+
+[ext_resource type="PackedScene" uid="uid://cg44j5qwbnmae" path="res://JiggleBoneTesting/Lilith/Lilith.glb" id="1_kktrh"]
+[ext_resource type="Script" path="res://com.naelstrof.jigglebones/JiggleSkeleton.cs" id="2_eoh3e"]
+[ext_resource type="Material" uid="uid://cp8ocyo8e7h23" path="res://JiggleBoneTesting/Lilith/LilithBody.tres" id="2_ml5s1"]
+[ext_resource type="Material" uid="uid://gwvph6lgh5hh" path="res://JiggleBoneTesting/Lilith/LilithEyes.tres" id="3_tkn0w"]
+[ext_resource type="Script" path="res://com.naelstrof.jigglebones/JiggleRig.cs" id="4_4yyxb"]
+[ext_resource type="AnimationLibrary" uid="uid://d4k74dqtn2dwt" path="res://GenericAnimations/Walking.fbx" id="4_b0yfj"]
+[ext_resource type="Script" path="res://JiggleBoneTesting/AutoWalker.cs" id="5_6ch0g"]
+[ext_resource type="Script" path="res://com.naelstrof.jigglebones/JiggleSettings.cs" id="5_36d6f"]
+[ext_resource type="Material" uid="uid://fce0nuabyluv" path="res://JiggleBoneTesting/Lilith/Latex.tres" id="5_fb0aj"]
+
+[sub_resource type="Curve" id="Curve_i4pav"]
+
+[sub_resource type="Resource" id="Resource_mpqti"]
+script = ExtResource("5_36d6f")
+gravityMultiplier = 0.2
+friction = 0.104
+angleElasticity = 0.4
+blend = 1.0
+airDrag = 0.1
+lengthElasticity = 0.897
+elasticitySoften = 0.036
+radiusMultiplier = 0.0
+radiusCurve = SubResource("Curve_i4pav")
+
+[node name="Lilith" instance=ExtResource("1_kktrh")]
+
+[node name="GeneralSkeleton" parent="Armature" index="0" node_paths=PackedStringArray("player")]
+bones/0/position = Vector3(0.00559072, 0.926154, 0.0120786)
+bones/0/rotation = Quaternion(-0.00595516, 0.087886, -0.040664, 0.995282)
+bones/1/rotation = Quaternion(0.0226254, -0.00746092, 0.0299813, 0.999266)
+bones/2/rotation = Quaternion(0.0143016, -0.0199879, 0.00709266, 0.999673)
+bones/3/rotation = Quaternion(-0.0292946, -0.0102939, -0.00828717, 0.999484)
+bones/4/rotation = Quaternion(-0.0118595, -0.033483, 0.00310018, 0.999364)
+bones/23/rotation = Quaternion(0.359005, 0.555781, 0.608042, -0.438757)
+bones/24/rotation = Quaternion(-0.0395313, 0.78238, -0.621402, 0.0133271)
+bones/25/rotation = Quaternion(0.220298, -0.671914, 0.220298, 0.671914)
+bones/26/rotation = Quaternion(0.114883, 0.800568, 0.137614, 0.5718)
+bones/27/rotation = Quaternion(-0.0503657, 0.603831, 0.169823, 0.777182)
+bones/28/rotation = Quaternion(-0.0983775, 0.0584498, 0.0346979, 0.992825)
+bones/29/rotation = Quaternion(-2.98023e-08, 8.9407e-08, 2.98023e-08, 1)
+bones/30/rotation = Quaternion(0.146141, -0.000852764, -0.0216196, 0.989027)
+bones/31/rotation = Quaternion(0.0335985, -0.000229552, -0.00155082, 0.999434)
+bones/32/rotation = Quaternion(0, 0, -5.96046e-08, 1)
+bones/33/rotation = Quaternion(0.234053, -0.00184345, -0.0304574, 0.971745)
+bones/34/rotation = Quaternion(0.139005, 0.000107422, -0.0162875, 0.990158)
+bones/35/rotation = Quaternion(-1.49012e-08, 2.98023e-08, -7.45058e-08, 1)
+bones/36/rotation = Quaternion(0.149209, 0.00103416, -0.0178127, 0.988645)
+bones/37/rotation = Quaternion(0.10957, 0.00143225, -0.0107965, 0.993919)
+bones/38/rotation = Quaternion(0, 0, -5.96046e-08, 1)
+bones/39/rotation = Quaternion(0.251064, -0.00176272, -0.0237089, 0.967679)
+bones/40/rotation = Quaternion(0.0586311, -0.000131756, -0.0133693, 0.99819)
+bones/41/rotation = Quaternion(1.49012e-08, -1.49012e-08, -4.47035e-08, 1)
+bones/43/rotation = Quaternion(-0.501872, 0.501252, 0.542648, 0.449894)
+bones/44/rotation = Quaternion(0.133691, 0.787411, -0.585445, 0.139162)
+bones/45/rotation = Quaternion(0.197969, 0.678829, -0.197968, 0.678829)
+bones/46/rotation = Quaternion(0.0805586, -0.844121, -0.00919439, 0.529987)
+bones/47/rotation = Quaternion(0.414584, 0.00290833, 0.0402198, 0.909118)
+bones/48/rotation = Quaternion(0.368639, 0.0114479, 0.0198996, 0.929289)
+bones/50/rotation = Quaternion(0.20602, -0.00142075, 0.0234393, 0.978266)
+bones/51/rotation = Quaternion(0.175498, 0.00144506, 0.00160247, 0.984478)
+bones/52/rotation = Quaternion(-5.96046e-08, -5.96046e-08, -5.96046e-08, 1)
+bones/53/rotation = Quaternion(0.325136, 0.00268067, 0.0394005, 0.944842)
+bones/54/rotation = Quaternion(0.267637, 0.000281662, 0.0277736, 0.96312)
+bones/55/rotation = Quaternion(0, 5.96046e-08, 0, 1)
+bones/56/rotation = Quaternion(0.231028, 0.00144118, 0.0300967, 0.972481)
+bones/57/rotation = Quaternion(0.151553, 0.00222896, 0.00487226, 0.988435)
+bones/58/rotation = Quaternion(0, 0, -1.19209e-07, 1)
+bones/59/rotation = Quaternion(-0.252539, -0.740321, -0.118069, 0.611726)
+bones/60/rotation = Quaternion(-0.0737215, 0.133839, 0.00819516, 0.988223)
+bones/61/rotation = Quaternion(-1.49012e-08, 4.47035e-08, 0, 1)
+bones/65/rotation = Quaternion(-0.00267467, 0.194731, 0.980384, -0.0303142)
+bones/66/rotation = Quaternion(-0.0607876, 0.845525, -0.530205, -0.016603)
+bones/67/rotation = Quaternion(-0.00772192, 0.716259, -0.69771, 0.0106378)
+bones/68/rotation = Quaternion(-7.89482e-09, 0.999906, 0.0136757, 2.2584e-09)
+bones/71/rotation = Quaternion(-0.105288, 0.082758, 0.986799, -0.0910689)
+bones/72/rotation = Quaternion(0.0145232, 0.988388, -0.150598, 0.0140858)
+bones/73/rotation = Quaternion(-0.0605507, 0.657541, -0.750974, -0.0033547)
+bones/74/rotation = Quaternion(1.28881e-08, 0.999707, 0.024198, -1.2686e-08)
+script = ExtResource("2_eoh3e")
+player = NodePath("../AutoWalker")
+
+[node name="Body" parent="Armature/GeneralSkeleton" index="0"]
+surface_material_override/0 = ExtResource("2_ml5s1")
+surface_material_override/1 = ExtResource("3_tkn0w")
+surface_material_override/2 = ExtResource("5_fb0aj")
+
+[node name="JiggleRig" type="Node" parent="Armature/GeneralSkeleton" index="1"]
+script = ExtResource("4_4yyxb")
+rootBoneName = "LeftUpperArm"
+jiggleSettings = SubResource("Resource_mpqti")
+
+[node name="JiggleRig2" type="Node" parent="Armature/GeneralSkeleton" index="2"]
+script = ExtResource("4_4yyxb")
+rootBoneName = "Neck"
+jiggleSettings = SubResource("Resource_mpqti")
+
+[node name="JiggleTail" type="Node" parent="Armature/GeneralSkeleton" index="3"]
+script = ExtResource("4_4yyxb")
+rootBoneName = "Tail1"
+jiggleSettings = SubResource("Resource_mpqti")
+
+[node name="AutoWalker" type="AnimationPlayer" parent="Armature" index="1"]
+reset_on_save = false
+libraries = {
+"Walking": ExtResource("4_b0yfj")
+}
+script = ExtResource("5_6ch0g")

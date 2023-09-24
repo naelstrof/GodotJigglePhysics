@@ -1,0 +1,23 @@
+[gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://gwvph6lgh5hh"]
+
+[ext_resource type="Shader" uid="uid://b6hjqmlici6mw" path="res://com.naelstrof.shaders/VilarEye.tres" id="1_uwcj6"]
+[ext_resource type="Texture2D" uid="uid://bqm72vtlilebj" path="res://JiggleBoneTesting/Lilith/LitheKoboldEye_Height.png" id="2_4vc50"]
+[ext_resource type="Texture2D" uid="uid://xylnwlq47g0n" path="res://JiggleBoneTesting/Lilith/LitheKoboldEye_BaseColor.png" id="3_mcwtk"]
+[ext_resource type="Texture2D" uid="uid://vna737ybx54j" path="res://JiggleBoneTesting/Lilith/KoboldEye_OpenGLNormal.png" id="4_6tmsj"]
+[ext_resource type="Texture2D" uid="uid://12dgkf0fnnlo" path="res://JiggleBoneTesting/Lilith/eyecube.png" id="4_glp6x"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_uwcj6")
+shader_parameter/Scelera = Color(0.0627451, 0.0470588, 0.14902, 1)
+shader_parameter/Blood = Color(0.286275, 0.172549, 0.309804, 1)
+shader_parameter/IrisBlend = 0.07
+shader_parameter/IrisSize = 0.693
+shader_parameter/IrisRing = Color(0.192157, 0.176471, 0.235294, 1)
+shader_parameter/Depth = 0.495
+shader_parameter/PupilDilationFrequency = 0.462
+shader_parameter/EmissionPower = 0.495
+shader_parameter/StylizedReflection = ExtResource("4_glp6x")
+shader_parameter/NormalMap = ExtResource("4_6tmsj")
+shader_parameter/HeightMap = ExtResource("2_4vc50")
+shader_parameter/IrisBaseColor = ExtResource("3_mcwtk")

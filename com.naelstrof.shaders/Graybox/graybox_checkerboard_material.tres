@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://dqp2n71rvfx3c"]
+
+[ext_resource type="Shader" uid="uid://vlx47fdqtna5" path="res://com.naelstrof.shaders/Graybox/graybox_checkerboard.tres" id="1_40dd5"]
+[ext_resource type="Texture2D" uid="uid://dasjagxsxwimn" path="res://com.naelstrof.shaders/Graybox/GridTile_BaseColor.png" id="2_t4vrb"]
+[ext_resource type="Texture2D" uid="uid://jh1p47g17ec5" path="res://com.naelstrof.shaders/Graybox/GridTile_MaskMap.png" id="3_calqj"]
+[ext_resource type="Texture2D" uid="uid://dtajrgypg563f" path="res://com.naelstrof.shaders/Graybox/GridTile_Normal.png" id="3_sw8nr"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_40dd5")
+shader_parameter/triplanar_scale = Vector3(1, 1, 1)
+shader_parameter/triplanar_offset = null
+shader_parameter/triplanar_sharpness = 0.5
+shader_parameter/BaseColor = ExtResource("2_t4vrb")
+shader_parameter/MaskMap = ExtResource("3_calqj")
+shader_parameter/NormalMap = ExtResource("3_sw8nr")
