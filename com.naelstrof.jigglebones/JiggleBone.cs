@@ -321,7 +321,7 @@ public class JiggleBone {
 			Vector3 positionBlend = currentTargetAnimatedBoneFrame.position.Lerp(extrapolatedPosition, blend);
 			Vector3 childPositionBlend = child.currentTargetAnimatedBoneFrame.position.Lerp(child.extrapolatedPosition, blend);
 
-			var inverseParent = (targetSkeleton.GlobalTransform.Inverse() * ParentGlobalTransform).Inverse();
+			var inverseParent = (ParentGlobalTransform).Inverse();
 
 			if (parent != null) {
 				targetSkeleton.SetBonePosePosition(boneID??-1, inverseParent * positionBlend);

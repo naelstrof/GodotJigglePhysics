@@ -79,5 +79,3 @@ pivot = NodePath("../../Lilith/CameraPivotBasic")
 
 [node name="GameManager" type="Node" parent="."]
 script = ExtResource("7_3bbl7")
-
-[editable path="Lilith"]

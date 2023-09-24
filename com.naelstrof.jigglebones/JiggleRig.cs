@@ -42,6 +42,7 @@ public partial class JiggleRig : Node {
     }
 
 	public void Initialize(Skeleton3D targetSkeleton) {
+		rootBoneID = -1;
 	    for (int i = 0; i < targetSkeleton.GetBoneCount(); i++) {
 		    if (targetSkeleton.GetBoneName(i) != rootBoneName) {
 			    continue;
@@ -49,6 +50,11 @@ public partial class JiggleRig : Node {
 		    rootBoneID = i;
 		    break;
 	    }
+
+	    if (rootBoneID == -1) {
+		    throw new Exception($"Couldn't find bone with name {targetSkeleton}");
+	    }
+
 	    simulatedPoints = new List<JiggleBone>();
 		CreateSimulatedPoints(targetSkeleton, simulatedPoints, new int[]{}, rootBoneID, null);
 		foreach (var simulatedPoint in simulatedPoints) {
@@ -111,7 +117,7 @@ public partial class JiggleRig : Node {
 	    }
     }
 
-    /*public void PrepareTeleport() {
+    public void PrepareTeleport() {
 	    foreach (JiggleBone simulatedPoint in simulatedPoints) {
 		    simulatedPoint.PrepareTeleport();
 	    }
@@ -121,5 +127,5 @@ public partial class JiggleRig : Node {
 	    foreach (JiggleBone simulatedPoint in simulatedPoints) {
 		    simulatedPoint.FinishTeleport();
 	    }
-    }*/
+    }
 }
