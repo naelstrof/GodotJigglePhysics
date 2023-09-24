@@ -10,6 +10,8 @@ public partial class JiggleSkeleton : Skeleton3D {
 	private List<JiggleRig> rigs;
 	private ulong lastUpdate;
 	private ulong accumulation;
+	[Export]
+	public AnimationPlayer.AnimationProcessCallback PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Idle;
 	// 60 hz
 	private const ulong fixedTickDelta = 16667;
 	public override void _Ready() {
@@ -22,14 +24,11 @@ public partial class JiggleSkeleton : Skeleton3D {
 		lastUpdate = Time.GetTicksUsec();
 	}
 
-	public override void _Process(double delta) {
-		//foreach(JiggleRig rig in rigs) {
-			//rig.PrePass(this);
-		//}
-
-		ResetBonePoses();
+	public void Advance(double delta) {
+		foreach(JiggleRig rig in rigs) {
+			rig.Reset();
+		}
 		player.Advance(delta);
-		base._Process(delta);
 		foreach(JiggleRig rig in rigs) {
 			rig.PrepareBone();
 		}
@@ -58,20 +57,24 @@ public partial class JiggleSkeleton : Skeleton3D {
 		foreach (JiggleRig rig in rigs) {
 			rig.DeriveFinalSolve(fixedTickDelta);
 		}
-		
-		foreach (JiggleRig rig in rigs) {
-			rig.DebugDraw();
-		}
-		
 		foreach (JiggleRig rig in rigs) {
 			rig.Pose();
 		}
 	}
 
-	public override void _PhysicsProcess(double delta) {
-		base._PhysicsProcess(delta);
-		if (player.PlaybackProcessMode != AnimationPlayer.AnimationProcessCallback.Physics) {
+	public override void _Process(double delta) {
+		base._Process(delta);
+		if (PlaybackProcessMode != AnimationPlayer.AnimationProcessCallback.Idle) {
 			return;
 		}
+		Advance(delta);
+	}
+
+	public override void _PhysicsProcess(double delta) {
+		base._PhysicsProcess(delta);
+		if (PlaybackProcessMode != AnimationPlayer.AnimationProcessCallback.Physics) {
+			return;
+		}
+		Advance(delta);
 	}
 }

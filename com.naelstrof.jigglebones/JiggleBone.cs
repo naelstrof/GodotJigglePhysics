@@ -61,18 +61,6 @@ public class JiggleBone {
 
 	private Vector3 extrapolatedPosition;
 
-	// Optimized out, faster to cache once during PrepareBone and reuse.
-	/*public Vector3 interpolatedPosition {
-		get {
-			// extrapolation, because interpolation is delayed by fixedDeltaTime
-			float timeSinceLastUpdate = Time.time-Time.fixedTime;
-			return Vector3.Lerp(position, position+(position-previousPosition), timeSinceLastUpdate/Time.fixedDeltaTime);
-
-			// Interpolation
-			//return Vector3.Lerp(previousPosition, position, timeSinceLastUpdate/Time.fixedDeltaTime);
-		}
-	}*/
-	
 	private float GetLengthToParent() {
 		if (parent == null) {
 			return 0.1f;
@@ -153,7 +141,7 @@ public class JiggleBone {
 	}
 
 	public void SecondPass(JiggleSettingsBase jiggleSettings) {
-		//position = ConstrainLengthBackwards(position, jiggleSettings.GetParameter(JiggleSettingsBase.JiggleSettingParameter.LengthElasticity)*jiggleSettings.GetParameter(JiggleSettingsBase.JiggleSettingParameter.LengthElasticity)*0.5f);
+		position = ConstrainLengthBackwards(position, jiggleSettings.GetParameter(JiggleSettingsBase.JiggleSettingParameter.LengthElasticity)*jiggleSettings.GetParameter(JiggleSettingsBase.JiggleSettingParameter.LengthElasticity)*0.5f);
 	}
 
 	public void ThirdPass(JiggleSettingsBase jiggleSettings) {
@@ -217,7 +205,7 @@ public class JiggleBone {
 		return newPosition.Lerp(parent.position + dir * GetLengthToParent(), elasticity);
 	}
 
-	/*public void PrepareTeleport() {
+	public void PrepareTeleport() {
 		if (!boneID.HasValue) {
 			Vector3 parentTransformPosition = parent.GlobalTransform.Origin;
 			preTeleportPosition = parent.GlobalTransform * (parent.ParentGlobalTransform.Inverse() * parentTransformPosition);
@@ -241,7 +229,7 @@ public class JiggleBone {
 		previousPosition += diff;
 	}
 
-	private Vector3 ConstrainAngleBackward(Vector3 newPosition, float elasticity, float elasticitySoften) {
+	/*private Vector3 ConstrainAngleBackward(Vector3 newPosition, float elasticity, float elasticitySoften) {
 		if (child == null || child.child == null) {
 			return newPosition;
 		}
@@ -272,8 +260,6 @@ public class JiggleBone {
 		}
 		Vector3 parentAimTargetPose = parent.currentFixedAnimatedBonePosition - poseParentParent;
 		Vector3 parentAim = parent.position - parentParentPosition;
-		DebugDraw3D.DrawLine(parent.position, parentParentPosition, Colors.Green);
-		DebugDraw3D.DrawLine(poseParentParent, parent.currentFixedAnimatedBonePosition, Colors.Yellow);
 		Quaternion targetPoseToPose = new Quaternion(parentAimTargetPose.Normalized(),parentAim.Normalized()).Normalized();
 		Vector3 currentPose = currentFixedAnimatedBonePosition - poseParentParent;
 		Vector3 constraintTarget = targetPoseToPose * currentPose;
@@ -313,21 +299,6 @@ public class JiggleBone {
 		CacheAnimationPosition();
 	}
 
-	public void OnDrawGizmos(JiggleSettingsBase jiggleSettings) {
-		/*if (transform != null && child != null && child.transform != null) {
-			Gizmos.DrawLine(transform.position, child.transform.position);
-		}
-		if (transform != null && child != null && child.transform == null) {
-			Gizmos.DrawLine(transform.position, child.GetProjectedPosition());
-		}
-		if (transform != null && jiggleSettings != null) {
-			Gizmos.DrawWireSphere(transform.position, jiggleSettings.GetRadius(normalizedIndex));
-		}
-		if (transform == null && jiggleSettings != null) {
-			Gizmos.DrawWireSphere(GetProjectedPosition(), jiggleSettings.GetRadius(normalizedIndex));
-		}*/
-	}
-
 	public void DrawDebug(float simulated) {
 		Vector3 positionBlend = currentTargetAnimatedBoneFrame.position.Lerp(extrapolatedPosition, simulated);
 		if (child != null) {
@@ -336,6 +307,12 @@ public class JiggleBone {
 		}
 		if (boneID.HasValue) {
 			DebugDraw3D.DrawLine(GlobalTransform.Origin, ParentGlobalTransform.Origin, Colors.Green);
+		}
+	}
+
+	public void ResetBone() {
+		if (boneID.HasValue) {
+			targetSkeleton.ResetBonePose((boneID.Value));
 		}
 	}
 

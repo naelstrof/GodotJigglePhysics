@@ -99,6 +99,12 @@ public partial class JiggleRig : Node {
 	    } 
     }
 
+    public void Reset() {
+	    foreach (JiggleBone simulatedPoint in simulatedPoints) {
+		    simulatedPoint.ResetBone();
+	    } 
+    }
+
     public void DebugDraw() {
 	    foreach (JiggleBone simulatedPoint in simulatedPoints) {
 		    simulatedPoint.DrawDebug(1f);

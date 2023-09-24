@@ -25,14 +25,14 @@ public partial class JiggleSettings : JiggleSettingsBase {
     [Export(PropertyHint.Range, "0,1")]
     private float elasticitySoften = 0f;
     //[HideInInspector] [SerializeField] [Tooltip("How much radius points have, only used for collisions. Set to 0 to disable collisions")]
-    [Export]
-    private float radiusMultiplier = 0f;
+    //[Export]
+    //private float radiusMultiplier = 0f;
     //[HideInInspector] [SerializeField] [Tooltip("How the radius is expressed as a curve along the bone chain from root to child.")]
-    [Export]
-    private Curve radiusCurve  = new() {
-        MinValue = 0f,
-        MaxValue = 1f,
-    };
+    //[Export]
+    //private Curve radiusCurve  = new() {
+        //MinValue = 0f,
+        //MaxValue = 1f,
+    //};
     
     public override float GetParameter(JiggleSettingParameter parameter) {
         switch(parameter) {
@@ -60,6 +60,6 @@ public partial class JiggleSettings : JiggleSettingsBase {
     }
 
     public override float GetRadius(float normalizedIndex) {
-        return radiusMultiplier * radiusCurve.Sample(normalizedIndex);
+        return 0f; //radiusMultiplier * radiusCurve.Sample(normalizedIndex);
     }
 }

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JiggleSettings" load_steps=2 format=3 uid="uid://edfexjqgqqrx"]
+
+[ext_resource type="Script" path="res://com.naelstrof.jigglebones/JiggleSettings.cs" id="1_w10kf"]
+
+[resource]
+script = ExtResource("1_w10kf")
+gravityMultiplier = 0.0
+friction = 0.1
+angleElasticity = 0.4
+blend = 0.6
+airDrag = 0.0
+lengthElasticity = 0.9
+elasticitySoften = 0.0
