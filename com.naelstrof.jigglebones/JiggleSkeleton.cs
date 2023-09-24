@@ -7,13 +7,15 @@ using System.Linq;
 public partial class JiggleSkeleton : Skeleton3D {
 	[Export]
 	private AnimationPlayer player;
+	[Export]
+	private AnimationPlayer.AnimationProcessCallback PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Idle;
+	
 	private List<JiggleRig> rigs;
 	private ulong lastUpdate;
 	private ulong accumulation;
-	[Export]
-	public AnimationPlayer.AnimationProcessCallback PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Idle;
 	// 60 hz
 	private const ulong fixedTickDelta = 16667;
+	
 	public override void _Ready() {
 		base._Ready();
 		player.PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Manual;

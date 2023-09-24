@@ -1,6 +1,6 @@
 using Godot;
 
-[GlobalClass]
+[GlobalClass, Tool]
 public partial class JiggleSettingsBase : Resource {
     public enum JiggleSettingParameter {
         Gravity = 0,
