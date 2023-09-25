@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 
 // This is used to blend other jiggle settings together.
+[GlobalClass]
 public partial class JiggleSettingsBlend : JiggleSettingsBase {
     //[Tooltip("The list of jiggle settings to blend between.")]
     public List<JiggleSettings> blendSettings;
