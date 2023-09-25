@@ -1,8 +1,10 @@
-//mod JiggleSettings;
+mod jiggle_settings;
+mod jiggle_skeleton;
+//mod jiggle_rig;
 
 use godot::prelude::*;
 
-struct JigglePhysics;
+struct MyExtension;
 
 #[gdextension]
-unsafe impl ExtensionLibrary for JigglePhysics {}
+unsafe impl ExtensionLibrary for MyExtension {}

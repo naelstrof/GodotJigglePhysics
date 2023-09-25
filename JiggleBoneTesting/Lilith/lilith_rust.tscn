@@ -1,0 +1,13 @@
+[gd_scene load_steps=5 format=3 uid="uid://ciaf60rfbdhki"]
+
+[ext_resource type="PackedScene" uid="uid://cg44j5qwbnmae" path="res://JiggleBoneTesting/Lilith/Lilith.glb" id="1_cbhjv"]
+[ext_resource type="Material" uid="uid://cp8ocyo8e7h23" path="res://JiggleBoneTesting/Lilith/LilithBody.tres" id="2_oc88f"]
+[ext_resource type="Material" uid="uid://gwvph6lgh5hh" path="res://JiggleBoneTesting/Lilith/LilithEyes.tres" id="3_oggff"]
+[ext_resource type="Material" uid="uid://fce0nuabyluv" path="res://JiggleBoneTesting/Lilith/Latex.tres" id="4_wm8lq"]
+
+[node name="Lilith" instance=ExtResource("1_cbhjv")]
+
+[node name="Body" parent="Armature/GeneralSkeleton" index="0"]
+surface_material_override/0 = ExtResource("2_oc88f")
+surface_material_override/1 = ExtResource("3_oggff")
+surface_material_override/2 = ExtResource("4_wm8lq")
