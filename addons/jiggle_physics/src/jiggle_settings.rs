@@ -81,7 +81,7 @@ impl JiggleSettingsData {
 #[class(base=Resource)]
 struct JiggleSettingsBlend {
     #[export]
-    settings: Vec<Option<Gd<dyn JiggleSettingsBaseVirtual>>>,
+    settings: Vec<Box<dyn JiggleSettingsBaseVirtual>>,
     #[init(default=0.0)]
     #[export(range=(0.0,1.0))]
     blend: f32
