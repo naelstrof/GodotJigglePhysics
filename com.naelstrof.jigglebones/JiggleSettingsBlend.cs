@@ -4,10 +4,13 @@ using Godot;
 
 // This is used to blend other jiggle settings together.
 [GlobalClass]
+[Tool]
 public partial class JiggleSettingsBlend : JiggleSettingsBase {
     //[Tooltip("The list of jiggle settings to blend between.")]
-    public List<JiggleSettings> blendSettings;
+    [Export]
+    public Godot.Collections.Array<JiggleSettingsBase> blendSettings;
     //[Range(0f,1f)][Tooltip("A value from 0 to 1 that linearly blends between all of the blendSettings.")]
+    [Export(PropertyHint.Range, "0,1")]
     public float normalizedBlend;
     public override float GetParameter(JiggleSettingParameter parameter) {
         int settingsCountSpace = blendSettings.Count - 1;
