@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JiggleSettings" load_steps=2 format=3 uid="uid://bhr274yrm5tt5"]
+
+[ext_resource type="Script" path="res://JigglePhysics/JiggleSettings.cs" id="1_dibla"]
+
+[resource]
+script = ExtResource("1_dibla")
+_gravityMultiplier = 0.479
+_friction = 0.205
+_angleElasticity = 0.305
+_blend = 1.0
+_airDrag = 0.023
+_lengthElasticity = 0.8
+_elasticitySoften = 0.0

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JiggleSettings" load_steps=2 format=3 uid="uid://rkri0tonhdte"]
+
+[ext_resource type="Script" path="res://JigglePhysics/JiggleSettings.cs" id="1_qn6oh"]
+
+[resource]
+script = ExtResource("1_qn6oh")
+_gravityMultiplier = 0.6
+_friction = 0.205
+_angleElasticity = 0.282
+_blend = 1.0
+_airDrag = 0.1
+_lengthElasticity = 0.8
+_elasticitySoften = 0.171

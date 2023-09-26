@@ -1,20 +1,20 @@
 [gd_scene load_steps=12 format=3 uid="uid://dgvysaeasl6f0"]
 
 [ext_resource type="PackedScene" uid="uid://cg44j5qwbnmae" path="res://JiggleBoneTesting/Lilith/Lilith.glb" id="1_kktrh"]
-[ext_resource type="Script" path="res://com.naelstrof.jigglebones/JiggleSkeleton.cs" id="2_eoh3e"]
+[ext_resource type="Script" path="res://JigglePhysics/JiggleSkeleton.cs" id="2_j3g37"]
 [ext_resource type="Material" uid="uid://cp8ocyo8e7h23" path="res://JiggleBoneTesting/Lilith/LilithBody.tres" id="2_ml5s1"]
 [ext_resource type="Material" uid="uid://gwvph6lgh5hh" path="res://JiggleBoneTesting/Lilith/LilithEyes.tres" id="3_tkn0w"]
-[ext_resource type="Script" path="res://com.naelstrof.jigglebones/JiggleRig.cs" id="4_4yyxb"]
 [ext_resource type="AnimationLibrary" uid="uid://d4k74dqtn2dwt" path="res://GenericAnimations/Walking.fbx" id="4_b0yfj"]
 [ext_resource type="Script" path="res://JiggleBoneTesting/AutoWalker.cs" id="5_6ch0g"]
 [ext_resource type="Material" uid="uid://fce0nuabyluv" path="res://JiggleBoneTesting/Lilith/Latex.tres" id="5_fb0aj"]
-[ext_resource type="Resource" uid="uid://bhr274yrm5tt5" path="res://JiggleBoneTesting/Lilith/JiggleEars.tres" id="7_jbrpl"]
-[ext_resource type="Resource" uid="uid://rkri0tonhdte" path="res://JiggleBoneTesting/Lilith/JiggleTail.tres" id="8_d4q2c"]
-[ext_resource type="Resource" uid="uid://edfexjqgqqrx" path="res://JiggleBoneTesting/Lilith/JiggleSmallBreasts.tres" id="9_h3vjw"]
+[ext_resource type="Script" path="res://JigglePhysics/JiggleRig.cs" id="6_lw2uv"]
+[ext_resource type="Resource" uid="uid://bhr274yrm5tt5" path="res://JiggleBoneTesting/Lilith/JiggleSettings/JiggleEars.tres" id="7_06ytb"]
+[ext_resource type="Resource" uid="uid://rkri0tonhdte" path="res://JiggleBoneTesting/Lilith/JiggleSettings/JiggleTail.tres" id="8_bywul"]
+[ext_resource type="Resource" uid="uid://edfexjqgqqrx" path="res://JiggleBoneTesting/Lilith/JiggleSettings/JiggleSmallBreasts.tres" id="9_26c1r"]
 
 [node name="Lilith" instance=ExtResource("1_kktrh")]
 
-[node name="GeneralSkeleton" parent="Armature" index="0" node_paths=PackedStringArray("player")]
+[node name="GeneralSkeleton" parent="Armature" index="0"]
 bones/0/position = Vector3(0.00559072, 0.926154, 0.0120786)
 bones/0/rotation = Quaternion(-0.00595516, 0.087886, -0.040664, 0.995282)
 bones/1/rotation = Quaternion(0.0226254, -0.00746092, 0.0299813, 0.999266)
@@ -66,8 +66,7 @@ bones/71/rotation = Quaternion(-0.105288, 0.082758, 0.986799, -0.0910689)
 bones/72/rotation = Quaternion(0.0145232, 0.988388, -0.150598, 0.0140858)
 bones/73/rotation = Quaternion(-0.0605507, 0.657541, -0.750974, -0.0033547)
 bones/74/rotation = Quaternion(1.28881e-08, 0.999707, 0.024198, -1.2686e-08)
-script = ExtResource("2_eoh3e")
-player = NodePath("../AutoWalker")
+script = ExtResource("2_j3g37")
 
 [node name="Body" parent="Armature/GeneralSkeleton" index="0"]
 surface_material_override/0 = ExtResource("2_ml5s1")
@@ -75,29 +74,34 @@ surface_material_override/1 = ExtResource("3_tkn0w")
 surface_material_override/2 = ExtResource("5_fb0aj")
 
 [node name="JiggleLeftEar" type="Node" parent="Armature/GeneralSkeleton" index="1"]
-script = ExtResource("4_4yyxb")
-boneName = "      Ear.L"
-jiggleSettings = ExtResource("7_jbrpl")
+script = ExtResource("6_lw2uv")
+BoneName = "      Ear.L"
+_jiggleSettings = ExtResource("7_06ytb")
 
 [node name="JiggleTail" type="Node" parent="Armature/GeneralSkeleton" index="2"]
-script = ExtResource("4_4yyxb")
-boneName = "  Tail1"
-jiggleSettings = ExtResource("8_d4q2c")
+script = ExtResource("6_lw2uv")
+BoneName = "  Tail1"
+_jiggleSettings = ExtResource("8_bywul")
 
 [node name="JiggleRightBreast" type="Node" parent="Armature/GeneralSkeleton" index="3"]
-script = ExtResource("4_4yyxb")
-boneName = "    Breast.R"
-jiggleSettings = ExtResource("9_h3vjw")
+script = ExtResource("6_lw2uv")
+BoneName = "    Breast.R"
+_jiggleSettings = ExtResource("9_26c1r")
 
 [node name="JiggleRightEar" type="Node" parent="Armature/GeneralSkeleton" index="4"]
-script = ExtResource("4_4yyxb")
-boneName = "      Ear.R"
-jiggleSettings = ExtResource("7_jbrpl")
+script = ExtResource("6_lw2uv")
+BoneName = "      Ear.R"
+_jiggleSettings = ExtResource("7_06ytb")
 
 [node name="JiggleLeftBreast" type="Node" parent="Armature/GeneralSkeleton" index="5"]
-script = ExtResource("4_4yyxb")
-boneName = "    Breast.L"
-jiggleSettings = ExtResource("9_h3vjw")
+script = ExtResource("6_lw2uv")
+BoneName = "    Breast.L"
+_jiggleSettings = ExtResource("9_26c1r")
+
+[node name="JiggleLeftArm" type="Node" parent="Armature/GeneralSkeleton" index="6"]
+script = ExtResource("6_lw2uv")
+BoneName = "     LeftUpperArm"
+_jiggleSettings = ExtResource("9_26c1r")
 
 [node name="AutoWalker" type="AnimationPlayer" parent="Armature" index="1"]
 reset_on_save = false

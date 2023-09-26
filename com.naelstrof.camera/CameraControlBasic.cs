@@ -11,12 +11,12 @@ partial class CameraControlBasic : CameraControl {
     }
 
     public override void OnStartControlFeed() {
-        Input.MouseMode = Input.MouseModeEnum.Captured;
+        //Input.MouseMode = Input.MouseModeEnum.Captured;
         feedingControl = true;
     }
     
     public override void OnEndControlFeed() {
-        Input.MouseMode = Input.MouseModeEnum.Visible;
+        //Input.MouseMode = Input.MouseModeEnum.Visible;
         feedingControl = false;
     }
 
