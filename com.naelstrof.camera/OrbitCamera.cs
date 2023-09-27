@@ -4,10 +4,15 @@ using Godot;
 [GlobalClass]
 partial class OrbitCamera : Camera3D {
     [Export] private CameraConfiguration _startingConfiguration;
+    private static OrbitCamera _instance;
+    public static OrbitCamera GetCamera() => _instance;
+    public static Vector2 GetCameraAngle() => new Vector2(_instance._data.pitch, _instance._data.yaw);
     
     private CameraData _data;
     public override void _Ready() {
         base._Ready();
+        _instance = this;
+        ProcessPriority = 1000;
         _data = _startingConfiguration.GetCameraData();
         _startingConfiguration.OnStartCameraFeed();
     }

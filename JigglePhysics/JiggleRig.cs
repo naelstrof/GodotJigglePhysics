@@ -15,6 +15,9 @@ public partial class JiggleRig : Node {
 			NotifyPropertyListChanged();
 		}
 	}
+	/*public JiggleBone.PositionFrame GetSampledPosition() => _simulatedPoints[0].GetSampledPosition();
+	public JiggleBone.PositionFrame GetParticleFrame() => _simulatedPoints[0].GetParticleFrame();
+	public JiggleBone.PositionFrame GetPredictedPosition() => _simulatedPoints[0].GetPredictedPosition();*/
 
 	private int _boneId = -1;
 	private int GetBone() {
@@ -112,45 +115,43 @@ public partial class JiggleRig : Node {
 	    _simulatedPoints = new List<JiggleBone>();
 		CreateSimulatedPoints(targetSkeleton, _simulatedPoints, new int[]{}, GetBone(), null);
 	}
-    public void PrepareBone() {
+    public void SampleBone(ulong time) {
 	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.PrepareBone();
+		    simulatedPoint.SampleBone(time);
 	    }
     }
 
-    public void FirstPass(Vector3 wind, ulong time, float deltaTime) {
+    public void FirstPass(Vector3 wind, ulong time, ulong delta) {
 	    var data = _jiggleSettings.GetData();
 	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.FirstPass(data, wind, time, deltaTime);
+		    simulatedPoint.FirstPass(data, wind, time, delta);
 	    }
     }
 
-    public void SecondPass() {
+    public void SecondPass(ulong time) {
 	    var data = _jiggleSettings.GetData();
 	    for (int i=_simulatedPoints.Count-1;i>=0;i--) {
-		    _simulatedPoints[i].SecondPass(data);
+		    _simulatedPoints[i].SecondPass(data, time);
 	    }
     }
 
-    public void ThirdPass() {
+    public void ThirdPass(ulong time) {
 	    var data = _jiggleSettings.GetData();
 	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.ThirdPass(data);
+		    simulatedPoint.ThirdPass(data, time);
 	    }
     }
 
-    public void DeriveFinalSolve(ulong deltaTime) {
-	    Vector3 virtualPosition = _simulatedPoints[0].DeriveFinalSolvePosition(Vector3.Zero, 1f, deltaTime);
-	    Vector3 offset = _simulatedPoints[0].Position - virtualPosition;
+    public void DeriveFinalSolve(ulong time) {
 	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.DeriveFinalSolvePosition(offset, 1f, deltaTime);
+		    simulatedPoint.DeriveFinalSolvePosition(time);
 	    }
     }
 
-    public void Pose() {
+    public void Pose(ulong time) {
 	    var data = _jiggleSettings.GetData();
 	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.PoseBone(data.Blend);
+		    simulatedPoint.PoseBone(data.Blend, time);
 	    } 
     }
 
@@ -166,15 +167,4 @@ public partial class JiggleRig : Node {
 	    }
     }
 
-    public void PrepareTeleport() {
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.PrepareTeleport();
-	    }
-    }
-
-    public void FinishTeleport() {
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.FinishTeleport();
-	    }
-    }
 }

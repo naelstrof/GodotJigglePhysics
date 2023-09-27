@@ -1,61 +1,61 @@
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
+using JigglePhysics;
 
 [GlobalClass]
 public partial class JiggleSkeleton : Skeleton3D {
 	private List<JiggleRig> _rigs;
-	private ulong _lastUpdate;
-	private ulong _accumulation;
-	// 60 hz
+	private JiggleTimer _solveTimer;
 	[Export]
 	public AnimationPlayer.AnimationProcessCallback PlaybackProcessMode = AnimationPlayer.AnimationProcessCallback.Idle;
-	private const ulong FixedTickDelta = 16667;
 	public override void _Ready() {
 		base._Ready();
+		_solveTimer = new JiggleTimer(Time.GetTicksUsec(),60f, false);
+		_solveTimer.Tick += ComputeSolve;
+		
 		_rigs = new List<JiggleRig>(GetChildren().OfType<JiggleRig>());
 		foreach (var rig in _rigs) {
 			rig.Initialize(this);
 		}
 
-		int beforeAnimation = -1000;
+		int beforeAnimation = 100;
 		ProcessPriority = beforeAnimation;
 		ProcessPhysicsPriority = beforeAnimation;
-		_lastUpdate = Time.GetTicksUsec();
 	}
 
-	public void Advance() {
+	private void Sample(ulong time, ulong delta) {
 		foreach(JiggleRig rig in _rigs) {
-			rig.PrepareBone();
-		}
-		ulong uTicksDelta = Time.GetTicksUsec() - _lastUpdate;
-		_lastUpdate = Time.GetTicksUsec();
-		const ulong secondsToMicroseconds = 1000000;
-		const float fixedFloatDelta = (float)FixedTickDelta / (float)secondsToMicroseconds;
-		_accumulation += uTicksDelta;
-		while (_accumulation > FixedTickDelta) {
-			_accumulation -= FixedTickDelta;
-			ulong time = Time.GetTicksUsec() - FixedTickDelta;
-			foreach(JiggleRig rig in _rigs) {
-				Vector3 wind = Vector3.Zero;
-				rig.FirstPass(wind, time, fixedFloatDelta);
-			}
-			foreach (JiggleRig rig in _rigs) {
-				rig.SecondPass();
-			}
-			foreach (JiggleRig rig in _rigs) {
-				rig.ThirdPass();
-			}
-		}
-		foreach (JiggleRig rig in _rigs) {
-			rig.DeriveFinalSolve(FixedTickDelta);
-		}
-		foreach (JiggleRig rig in _rigs) {
-			rig.Pose();
+			rig.SampleBone(time);
 		}
 	}
 
-	public void Reset() {
+	private void ComputeSolve(ulong time, ulong delta) {
+		foreach(JiggleRig rig in _rigs) {
+			Vector3 wind = Vector3.Zero;
+			rig.FirstPass(wind, time, delta);
+		}
+		foreach (JiggleRig rig in _rigs) {
+			rig.SecondPass(time);
+		}
+		foreach (JiggleRig rig in _rigs) {
+			rig.ThirdPass(time);
+		}
+	}
+	
+	private void Pose() {
+		ulong sampleTime = Time.GetTicksUsec();
+		Sample(sampleTime, 0);
+		_solveTimer.Update(sampleTime);
+		foreach (JiggleRig rig in _rigs) {
+			rig.DeriveFinalSolve(sampleTime);
+		}
+		foreach (JiggleRig rig in _rigs) {
+			rig.Pose(sampleTime);
+		}
+	}
+
+	private void Reset() {
 		foreach (JiggleRig rig in _rigs) {
 			rig.Reset();
 		}
@@ -65,13 +65,13 @@ public partial class JiggleSkeleton : Skeleton3D {
 		base._Process(delta);
 		if (PlaybackProcessMode != AnimationPlayer.AnimationProcessCallback.Idle) return;
 		Reset();
-		CallDeferred(nameof(Advance));
+		CallDeferred(nameof(Pose));
 	}
 
 	public override void _PhysicsProcess(double delta) {
 		base._PhysicsProcess(delta);
 		if (PlaybackProcessMode != AnimationPlayer.AnimationProcessCallback.Physics) return;
 		Reset();
-		CallDeferred(nameof(Advance));
+		CallDeferred(nameof(Pose));
 	}
 }

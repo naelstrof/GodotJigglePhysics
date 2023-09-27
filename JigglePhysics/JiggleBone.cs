@@ -5,17 +5,7 @@ namespace JigglePhysics;
 
 // Uses Verlet to resolve constraints easily 
 public class JiggleBone {
-	private struct PositionFrame {
-		public readonly Vector3 Position;
-		public readonly ulong Time;
-		public PositionFrame(Vector3 position, ulong time) {
-			this.Position = position;
-			this.Time = time;
-		}
-	}
-	
-	private PositionFrame _currentTargetAnimatedBoneFrame;
-	private PositionFrame _lastTargetAnimatedBoneFrame;
+	private PositionSignal _targetAnimatedBoneSignal;
 	private Vector3 _currentFixedAnimatedBonePosition;
 
 	public readonly JiggleBone Parent;
@@ -53,11 +43,8 @@ public class JiggleBone {
 		}
 	}
 
-	private ulong _updateTime;
-	private ulong _previousUpdateTime;
-	
-	public Vector3 Position;
-	private Vector3 _previousPosition;
+	private Vector3 _workingPosition;
+	private PositionSignal _particleSignal;
 
 	private Vector3 _preTeleportPosition;
 
@@ -70,30 +57,14 @@ public class JiggleBone {
 		return _currentFixedAnimatedBonePosition.DistanceTo(Parent._currentFixedAnimatedBonePosition);
 	}
 	
-	private static Vector3 GetTargetBonePosition(PositionFrame prev, PositionFrame next, ulong time) {
-		var diff = next.Time - prev.Time;
-		if (diff == 0) {
-			return prev.Position;
-		}
-		double t = ((double)time - (double)prev.Time) / (double)diff;
-		return prev.Position.Lerp(next.Position, (float)t);
-	}
-	
 	public JiggleBone(Skeleton3D skeleton, int? boneId, JiggleBone parent, Vector3 position) {
 		_targetSkeleton = skeleton;
 		_boneId = boneId;
 		Parent = parent;
-		Position = position;
-		_previousPosition = position;
+		var updateTime = Time.GetTicksUsec();
+		_targetAnimatedBoneSignal = new PositionSignal(position, updateTime);
+		_particleSignal = new PositionSignal(position, updateTime);
 		
-		if (boneId.HasValue) {
-		}
-
-		_updateTime = Time.GetTicksUsec();
-		_previousUpdateTime = _updateTime;
-		_lastTargetAnimatedBoneFrame = new PositionFrame(position, _updateTime);
-		_currentTargetAnimatedBoneFrame = _lastTargetAnimatedBoneFrame;
-
 		if (parent == null) {
 			return;
 		}
@@ -121,35 +92,36 @@ public class JiggleBone {
 		return frac;
 	}
 
-	public void FirstPass(JiggleData jiggleData, Vector3 wind, ulong time, float deltaTime) {
-		_currentFixedAnimatedBonePosition = GetTargetBonePosition(_lastTargetAnimatedBoneFrame, _currentTargetAnimatedBoneFrame, time);
+	public void FirstPass(JiggleData jiggleData, Vector3 wind, ulong time, ulong delta) {
+		const ulong secondsToMicroseconds = 1000000;
+		float fdelta = (float)delta / (float)secondsToMicroseconds;
+		_currentFixedAnimatedBonePosition = _targetAnimatedBoneSignal.SamplePosition(time);
 		if (Parent == null) {
-			RecordPosition(time);
-			Position = _currentFixedAnimatedBonePosition;
+			_workingPosition = _currentFixedAnimatedBonePosition;
+			_particleSignal.SetPosition(_currentFixedAnimatedBonePosition, time);
 			return;
 		}
-		Vector3 localSpaceVelocity = (Position-_previousPosition) - (Parent.Position-Parent._previousPosition);
-		Vector3 newPosition = NextPhysicsPosition(
-			Position, _previousPosition, localSpaceVelocity, deltaTime,
+		Vector3 localSpaceVelocity = (_particleSignal.GetCurrent()-_particleSignal.GetPrevious()) - (Parent._particleSignal.GetCurrent()-Parent._particleSignal.GetPrevious());
+		_workingPosition = NextPhysicsPosition(
+			_particleSignal.GetCurrent(), _particleSignal.GetPrevious(), localSpaceVelocity, fdelta,
 			jiggleData.GravityMultiplier,
 			jiggleData.Friction,
 			jiggleData.AirFriction
 		);
-		newPosition += wind * (deltaTime * jiggleData.AirFriction);
-		RecordPosition(time);
-		Position = newPosition;
+		_workingPosition += wind * (fdelta * jiggleData.AirFriction);
 	}
 
-	public void SecondPass(JiggleData jiggleData) {
-		Position = ConstrainLengthBackwards(Position, jiggleData.LengthElasticity*jiggleData.LengthElasticity*0.5f);
+	public void SecondPass(JiggleData jiggleData, ulong time) {
+		_workingPosition = ConstrainLengthBackwards(_workingPosition, jiggleData.LengthElasticity*jiggleData.LengthElasticity*0.5f);
 	}
 
-	public void ThirdPass(JiggleData jiggleData) {
+	public void ThirdPass(JiggleData jiggleData, ulong time) {
 		if (Parent == null) {
 			return;
 		}
-		Position = ConstrainAngle(Position, jiggleData.AngleElasticity*jiggleData.AngleElasticity, jiggleData.ElasticitySoften); 
-		Position = ConstrainLength(Position, jiggleData.LengthElasticity*jiggleData.LengthElasticity);
+		_workingPosition = ConstrainAngle(_workingPosition, jiggleData.AngleElasticity*jiggleData.AngleElasticity, jiggleData.ElasticitySoften); 
+		_workingPosition = ConstrainLength(_workingPosition, jiggleData.LengthElasticity*jiggleData.LengthElasticity);
+		_particleSignal.SetPosition(_workingPosition, time);
 	}
 	private Vector3 GetProjectedPosition() {
 		if (_boneId.HasValue) {
@@ -159,53 +131,27 @@ public class JiggleBone {
 		return ParentGlobalTransform * (Parent.ParentGlobalTransform.Inverse() * ParentGlobalTransform.Origin);
 	}
 
-	private void CacheAnimationPosition() {
-		// Purely virtual particles need to reconstruct their desired position.
-		_lastTargetAnimatedBoneFrame = _currentTargetAnimatedBoneFrame;
+	private void CacheAnimationPosition(ulong time) {
 		if (!_boneId.HasValue) {
-			_currentTargetAnimatedBoneFrame = new PositionFrame(GetProjectedPosition(), Time.GetTicksUsec());
+			_targetAnimatedBoneSignal.SetPosition(GetProjectedPosition(), time);
 			return;
 		}
-		_currentTargetAnimatedBoneFrame = new PositionFrame(GlobalTransform.Origin, Time.GetTicksUsec());
+		_targetAnimatedBoneSignal.SetPosition(GlobalTransform.Origin, time);
 	}
 
 	private Vector3 ConstrainLengthBackwards(Vector3 newPosition, float elasticity) {
 		if (_child == null) {
 			return newPosition;
 		}
-		Vector3 diff = newPosition - _child.Position;
+		Vector3 diff = newPosition - _child._workingPosition;
 		Vector3 dir = diff.Normalized();
-		return newPosition.Lerp(_child.Position + dir * _child.GetLengthToParent(), elasticity);
+		return newPosition.Lerp(_child._workingPosition + dir * _child.GetLengthToParent(), elasticity);
 	}
 
 	private Vector3 ConstrainLength(Vector3 newPosition, float elasticity) {
-		Vector3 diff = newPosition - Parent.Position;
+		Vector3 diff = newPosition - Parent._workingPosition;
 		Vector3 dir = diff.Normalized();
-		return newPosition.Lerp(Parent.Position + dir * GetLengthToParent(), elasticity);
-	}
-
-	public void PrepareTeleport() {
-		if (!_boneId.HasValue) {
-			Vector3 parentTransformPosition = Parent.GlobalTransform.Origin;
-			_preTeleportPosition = Parent.GlobalTransform * (Parent.ParentGlobalTransform.Inverse() * parentTransformPosition);
-			return;
-		}
-		_preTeleportPosition = GlobalTransform.Origin;
-	}
-	
-	public void FinishTeleport() {
-		Vector3 teleportedPosition;
-		if (!_boneId.HasValue) {
-			Vector3 parentTransformPosition = Parent.GlobalTransform.Origin;
-			teleportedPosition = Parent.GlobalTransform * Parent.ParentGlobalTransform.Inverse() * parentTransformPosition;
-		} else {
-			teleportedPosition = GlobalTransform.Origin;
-		}
-		Vector3 diff = teleportedPosition - _preTeleportPosition;
-		_lastTargetAnimatedBoneFrame = new PositionFrame(_lastTargetAnimatedBoneFrame.Position + diff, _lastTargetAnimatedBoneFrame.Time);
-		_currentTargetAnimatedBoneFrame = new PositionFrame(_currentTargetAnimatedBoneFrame.Position + diff, _currentTargetAnimatedBoneFrame.Time);
-		Position += diff;
-		_previousPosition += diff;
+		return newPosition.Lerp(Parent._workingPosition + dir * GetLengthToParent(), elasticity);
 	}
 
 	private Vector3 ConstrainAngle(Vector3 newPosition, float elasticity, float elasticitySoften) {
@@ -215,11 +161,11 @@ public class JiggleBone {
 			poseParentParent = Parent._currentFixedAnimatedBonePosition + (Parent._currentFixedAnimatedBonePosition - _currentFixedAnimatedBonePosition);
 			parentParentPosition = poseParentParent;
 		} else {
-			parentParentPosition = Parent.Parent.Position;
+			parentParentPosition = Parent.Parent._workingPosition;
 			poseParentParent = Parent.Parent._currentFixedAnimatedBonePosition;
 		}
 		Vector3 parentAimTargetPose = Parent._currentFixedAnimatedBonePosition - poseParentParent;
-		Vector3 parentAim = Parent.Position - parentParentPosition;
+		Vector3 parentAim = Parent._workingPosition - parentParentPosition;
 		Quaternion targetPoseToPose = new Quaternion(parentAimTargetPose.Normalized(),parentAim.Normalized()).Normalized();
 		Vector3 currentPose = _currentFixedAnimatedBonePosition - poseParentParent;
 		Vector3 constraintTarget = targetPoseToPose * currentPose;
@@ -229,13 +175,7 @@ public class JiggleBone {
 		error = Mathf.Pow(error, elasticitySoften * 2f);
 		return newPosition.Lerp(parentParentPosition + constraintTarget, elasticity * error);
 	}
-
-	private void RecordPosition(ulong time) {
-		_previousUpdateTime = _updateTime;
-		_previousPosition = Position;
-		_updateTime = time;
-	}
-
+	
 	public static Vector3 NextPhysicsPosition(Vector3 newPosition, Vector3 previousPosition, Vector3 localSpaceVelocity, float deltaTime, float gravityMultiplier, float friction, float airFriction) {
 		float squaredDeltaTime = deltaTime * deltaTime;
 		Vector3 vel = newPosition - previousPosition - localSpaceVelocity;
@@ -244,46 +184,46 @@ public class JiggleBone {
 		return newPosition + vel * (1f - airFriction) + localSpaceVelocity * (1f - friction) + gravity * (gravityMultiplier * squaredDeltaTime);
 	}
 
-	public Vector3 DeriveFinalSolvePosition(Vector3 offset, float smoothing, ulong deltaTime) {
-		float smoothAmount = (smoothing * deltaTime);
-		double t = ((Time.GetTicksUsec() - smoothAmount) - _previousUpdateTime) / (double)deltaTime;
-		_extrapolatedPosition = offset+_previousPosition.Lerp(Position, (float)t);
+	public Vector3 DeriveFinalSolvePosition(ulong time) {
+		_extrapolatedPosition = _particleSignal.SamplePosition(time);
 		return _extrapolatedPosition;
 	}
 
-	public void PrepareBone() {
-		// If bone is not animated, return to last unadulterated pose
-		if (_boneId.HasValue) {
-		}
-		CacheAnimationPosition();
+	public void SampleBone(ulong time) {
+		CacheAnimationPosition(time);
 	}
 
 	public void DrawDebug(float simulated) {
-		Vector3 positionBlend = _currentTargetAnimatedBoneFrame.Position.Lerp(_extrapolatedPosition, simulated);
+		/*Vector3 positionBlend = _currentTargetAnimatedBoneFrame.Position.Lerp(_extrapolatedPosition, simulated);
 		if (_child != null) {
 			Vector3 childPositionBlend = _child._currentTargetAnimatedBoneFrame.Position.Lerp(_child._extrapolatedPosition, simulated);
 			DebugDraw3D.DrawLine(positionBlend, childPositionBlend, Colors.Yellow);
 		}
 		if (_boneId.HasValue) {
 			DebugDraw3D.DrawLine(GlobalTransform.Origin, ParentGlobalTransform.Origin, Colors.Green);
-		}
+		}*/
 	}
 
 	public void ResetBone() {
 		if (_boneId.HasValue) {
-			_targetSkeleton.ResetBonePose((_boneId.Value));
+			_targetSkeleton.ResetBonePose(_boneId.Value);
 		}
 	}
 
-	public void PoseBone(float blend) {
+	public void SetBonePosition(Vector3 position) {
+		var inverseParent = (ParentGlobalTransform).Inverse();
+		_targetSkeleton.SetBonePosePosition(_boneId.Value, inverseParent * position);
+	}
+
+	public void PoseBone(float blend, ulong time) {
 		if (_child != null) {
-			Vector3 positionBlend = _currentTargetAnimatedBoneFrame.Position.Lerp(_extrapolatedPosition, blend);
-			Vector3 childPositionBlend = _child._currentTargetAnimatedBoneFrame.Position.Lerp(_child._extrapolatedPosition, blend);
+			Vector3 positionBlend = _targetAnimatedBoneSignal.SamplePosition(time).Lerp(_extrapolatedPosition, blend);
+			Vector3 childPositionBlend = _child._targetAnimatedBoneSignal.SamplePosition(time).Lerp(_child._extrapolatedPosition, blend);
 
 			var inverseParent = (ParentGlobalTransform).Inverse();
 
 			if (Parent != null) {
-				_targetSkeleton.SetBonePosePosition(_boneId??-1, inverseParent * positionBlend);
+				_targetSkeleton.SetBonePosePosition(_boneId.Value, inverseParent * positionBlend);
 			}
 
 			Vector3 childPosition;
@@ -301,8 +241,8 @@ public class JiggleBone {
 			Debug.Assert(_boneId != null, nameof(_boneId) + " != null");
 			_targetSkeleton.SetBonePoseRotation(_boneId.Value,animPoseToPhysicsPose*_targetSkeleton.GetBonePoseRotation(_boneId.Value));
 		}
-		if (_boneId.HasValue) {
-			_targetSkeleton.GetBoneGlobalPose(_boneId.Value);
-		}
+		//if (_boneId.HasValue) {
+			//_targetSkeleton.GetBoneGlobalPose(_boneId.Value);
+		//}
 	}
 }
