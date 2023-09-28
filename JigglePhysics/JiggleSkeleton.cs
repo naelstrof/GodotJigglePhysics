@@ -19,7 +19,7 @@ public partial class JiggleSkeleton : Skeleton3D {
 			rig.Initialize(this);
 		}
 
-		int beforeAnimation = 100;
+		int beforeAnimation = -100;
 		ProcessPriority = beforeAnimation;
 		ProcessPhysicsPriority = beforeAnimation;
 	}

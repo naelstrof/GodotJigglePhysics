@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_dibla")
-_gravityMultiplier = 0.479
+_gravityMultiplier = 0.459
 _friction = 0.205
 _angleElasticity = 0.305
 _blend = 1.0

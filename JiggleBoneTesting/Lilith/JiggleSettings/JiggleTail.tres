@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_qn6oh")
 _gravityMultiplier = 0.6
-_friction = 0.205
+_friction = 0.1
 _angleElasticity = 0.282
 _blend = 1.0
-_airDrag = 0.1
+_airDrag = 0.03
 _lengthElasticity = 0.8
 _elasticitySoften = 0.171

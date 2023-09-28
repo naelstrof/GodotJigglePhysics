@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dfj88iki06apt"]
+[gd_scene load_steps=15 format=3 uid="uid://dfj88iki06apt"]
 
 [ext_resource type="Material" uid="uid://dqp2n71rvfx3c" path="res://com.naelstrof.shaders/Graybox/graybox_checkerboard_material.tres" id="1_17twf"]
 [ext_resource type="Script" path="res://com.naelstrof.camera/CameraPivotBasic.cs" id="3_on4af"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://JiggleBoneTesting/GameManager.cs" id="7_3bbl7"]
 [ext_resource type="PackedScene" uid="uid://b10lcydh7at1m" path="res://JiggleBoneTesting/lilith_character_controller.tscn" id="7_rom3h"]
 [ext_resource type="PackedScene" uid="uid://du4exuw3p3c5y" path="res://JiggleBoneTesting/lilith_smooth_mover.tscn" id="8_1v62o"]
-[ext_resource type="Script" path="res://JiggleDebugPlotter.cs" id="9_v7sbv"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1i00r"]
 
@@ -67,78 +66,21 @@ pivot = NodePath("../../SmoothMover/CameraPivotBasic")
 [node name="GameManager" type="Node" parent="."]
 script = ExtResource("7_3bbl7")
 
-[node name="CharacterController" parent="." instance=ExtResource("7_rom3h")]
-visible = false
-
 [node name="SmoothMover" parent="." instance=ExtResource("8_1v62o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.438268, 0, -1.49772)
 
 [node name="CameraPivotBasic" type="Node3D" parent="SmoothMover" node_paths=PackedStringArray("cameraControl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0105259, 1.25278, 0.0125852)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00897717, 1.25278, -0.0221311)
 script = ExtResource("3_on4af")
 cameraControl = NodePath("../CameraControlBasic")
 
 [node name="CameraControlBasic" type="Node" parent="SmoothMover"]
 script = ExtResource("4_vyt24")
 
-[node name="Window" type="Window" parent="."]
-title = "Debug Plotter"
-position = Vector2i(75, 65)
-size = Vector2i(625, 445)
-visible = false
+[node name="SmoothMover2" parent="." instance=ExtResource("8_1v62o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.41595, 0, -1.49772)
 
-[node name="Background" type="Panel" parent="Window"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Window/Background"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="ScrollContainer" type="ScrollContainer" parent="Window/Background/VBoxContainer"]
-custom_minimum_size = Vector2(0, 400)
-layout_mode = 2
-
-[node name="Control" type="Control" parent="Window/Background/VBoxContainer/ScrollContainer" node_paths=PackedStringArray("targetRig")]
-layout_mode = 2
-script = ExtResource("9_v7sbv")
-targetRig = NodePath("../../../../../SmoothMover/Lilith/Armature/GeneralSkeleton/JiggleRig")
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Window/Background/VBoxContainer"]
-layout_mode = 2
-
-[node name="RealPositionToggle" type="Button" parent="Window/Background/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(50, 20)
-layout_mode = 2
-toggle_mode = true
-button_pressed = true
-text = "Real Pos"
-
-[node name="PredictedPositionToggle" type="Button" parent="Window/Background/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(50, 20)
-layout_mode = 2
-toggle_mode = true
-button_pressed = true
-text = "Predicted Pos"
-
-[node name="VirtualPositionToggle" type="Button" parent="Window/Background/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(50, 20)
-layout_mode = 2
-toggle_mode = true
-button_pressed = true
-text = "Virtual Pos"
-
-[connection signal="toggled" from="Window/Background/VBoxContainer/HBoxContainer/RealPositionToggle" to="Window/Background/VBoxContainer/ScrollContainer/Control" method="_on_real_position_toggle_toggled"]
-[connection signal="toggled" from="Window/Background/VBoxContainer/HBoxContainer/PredictedPositionToggle" to="Window/Background/VBoxContainer/ScrollContainer/Control" method="_on_predicted_position_toggle_toggled"]
-[connection signal="toggled" from="Window/Background/VBoxContainer/HBoxContainer/VirtualPositionToggle" to="Window/Background/VBoxContainer/ScrollContainer/Control" method="_on_virtual_position_toggle_toggled"]
+[node name="CharacterController" parent="." instance=ExtResource("7_rom3h")]
 
 [editable path="CharacterController"]
 [editable path="CharacterController/Smoothing/Lilith"]
-[editable path="SmoothMover"]
-[editable path="SmoothMover/Lilith"]

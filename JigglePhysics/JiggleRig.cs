@@ -15,15 +15,9 @@ public partial class JiggleRig : Node {
 			NotifyPropertyListChanged();
 		}
 	}
-	/*public JiggleBone.PositionFrame GetSampledPosition() => _simulatedPoints[0].GetSampledPosition();
-	public JiggleBone.PositionFrame GetParticleFrame() => _simulatedPoints[0].GetParticleFrame();
-	public JiggleBone.PositionFrame GetPredictedPosition() => _simulatedPoints[0].GetPredictedPosition();*/
 
 	private int _boneId = -1;
 	private int GetBone() {
-		if (_boneId != -1) {
-			return _boneId;
-		}
 		Skeleton3D skeleton = GetParentOrNull<Skeleton3D>();
 		if (skeleton == null) {
 			throw new Exception("Parent of jiggle rig wasn't a skeleton!");
@@ -82,89 +76,83 @@ public partial class JiggleRig : Node {
 		return properties;
 	}
 	private static void CreateSimulatedPoints(Skeleton3D targetSkeleton, ICollection<JiggleBone> outputPoints, ICollection<int> ignoredTransforms, int currentTransform, JiggleBone parentJiggleBone) {
-        var currentTransformPosition = targetSkeleton.GetBonePosePosition(currentTransform);
-        JiggleBone newJiggleBone = new JiggleBone(targetSkeleton, currentTransform, parentJiggleBone, currentTransformPosition);
-        outputPoints.Add(newJiggleBone);
-        // Create an extra purely virtual point if we have no children.
-        var children = targetSkeleton.GetBoneChildren(currentTransform);
-        if (children.Length == 0) {
-            if (newJiggleBone.Parent == null) {
-	            var parentPosition = newJiggleBone.ParentGlobalTransform.Origin;
+		var currentTransformPosition = targetSkeleton.GetBonePosePosition(currentTransform);
+		JiggleBone newJiggleBone = new JiggleBone(targetSkeleton, currentTransform, parentJiggleBone, currentTransformPosition);
+		outputPoints.Add(newJiggleBone);
+		// Create an extra purely virtual point if we have no children.
+		var children = targetSkeleton.GetBoneChildren(currentTransform);
+		if (children.Length == 0) {
+			if (newJiggleBone.Parent == null) {
+				var parentPosition = newJiggleBone.ParentGlobalTransform.Origin;
 				float lengthToParent = currentTransformPosition.DistanceTo(parentPosition);
 				Vector3 projectedForwardReal = (currentTransformPosition - parentPosition).Normalized();
 				outputPoints.Add(new JiggleBone(targetSkeleton,null, newJiggleBone, currentTransformPosition + projectedForwardReal*lengthToParent));
 				return;
-            }
-            Vector3 projectedForward = (currentTransformPosition - parentJiggleBone.GlobalTransform.Origin).Normalized();
-            float length = 0.1f;
-            if (parentJiggleBone.Parent != null) {
-                length = parentJiggleBone.GlobalTransform.Origin.DistanceTo(parentJiggleBone.ParentGlobalTransform.Origin);
-            }
-            outputPoints.Add(new JiggleBone(targetSkeleton, null, newJiggleBone, currentTransformPosition + projectedForward*length));
-            return;
-        }
-        foreach(var child in children) {
-            if (ignoredTransforms.Contains(child)) {
-                continue;
-            }
-            CreateSimulatedPoints(targetSkeleton, outputPoints, ignoredTransforms, child, newJiggleBone);
-        }
-    }
+			}
+			Vector3 projectedForward = (currentTransformPosition - parentJiggleBone.GlobalTransform.Origin).Normalized();
+			float length = 0.1f;
+			if (parentJiggleBone.Parent != null) {
+				length = parentJiggleBone.GlobalTransform.Origin.DistanceTo(parentJiggleBone.ParentGlobalTransform.Origin);
+			}
+			outputPoints.Add(new JiggleBone(targetSkeleton, null, newJiggleBone, currentTransformPosition + projectedForward*length));
+			return;
+		}
+		foreach(var child in children) {
+			if (ignoredTransforms.Contains(child)) {
+				continue;
+			}
+			CreateSimulatedPoints(targetSkeleton, outputPoints, ignoredTransforms, child, newJiggleBone);
+		}
+	}
 
 	public void Initialize(Skeleton3D targetSkeleton) {
-	    _simulatedPoints = new List<JiggleBone>();
+		_simulatedPoints = new List<JiggleBone>();
 		CreateSimulatedPoints(targetSkeleton, _simulatedPoints, new int[]{}, GetBone(), null);
 	}
-    public void SampleBone(ulong time) {
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.SampleBone(time);
-	    }
-    }
+	public void SampleBone(ulong time) {
+		foreach (JiggleBone simulatedPoint in _simulatedPoints) {
+			simulatedPoint.SampleBone(time);
+		}
+	}
 
-    public void FirstPass(Vector3 wind, ulong time, ulong delta) {
-	    var data = _jiggleSettings.GetData();
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.FirstPass(data, wind, time, delta);
-	    }
-    }
+	public void FirstPass(Vector3 wind, ulong time, ulong delta) {
+		var data = _jiggleSettings.GetData();
+		foreach (JiggleBone simulatedPoint in _simulatedPoints) {
+			simulatedPoint.FirstPass(data, wind, time, delta);
+		}
+	}
 
-    public void SecondPass(ulong time) {
-	    var data = _jiggleSettings.GetData();
-	    for (int i=_simulatedPoints.Count-1;i>=0;i--) {
-		    _simulatedPoints[i].SecondPass(data, time);
-	    }
-    }
+	public void SecondPass(ulong time) {
+		var data = _jiggleSettings.GetData();
+		for (int i=_simulatedPoints.Count-1;i>=0;i--) {
+			_simulatedPoints[i].SecondPass(data, time);
+		}
+	}
 
-    public void ThirdPass(ulong time) {
-	    var data = _jiggleSettings.GetData();
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.ThirdPass(data, time);
-	    }
-    }
+	public void ThirdPass(ulong time) {
+		var data = _jiggleSettings.GetData();
+		foreach (JiggleBone simulatedPoint in _simulatedPoints) {
+			simulatedPoint.ThirdPass(data, time);
+		}
+	}
 
-    public void DeriveFinalSolve(ulong time) {
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.DeriveFinalSolvePosition(time);
-	    }
-    }
+	public void DeriveFinalSolve(ulong time) {
+		foreach (JiggleBone simulatedPoint in _simulatedPoints) {
+			simulatedPoint.DeriveFinalSolvePosition(time);
+		}
+	}
 
-    public void Pose(ulong time) {
-	    var data = _jiggleSettings.GetData();
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.PoseBone(data.Blend, time);
-	    } 
-    }
+	public void Pose(ulong time) {
+		var data = _jiggleSettings.GetData();
+		foreach (JiggleBone simulatedPoint in _simulatedPoints) {
+			simulatedPoint.PoseBone(data.Blend, time);
+		} 
+	}
 
-    public void Reset() {
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.ResetBone();
-	    } 
-    }
-
-    public void DebugDraw() {
-	    foreach (JiggleBone simulatedPoint in _simulatedPoints) {
-		    simulatedPoint.DrawDebug(1f);
-	    }
-    }
+	public void Reset() {
+		foreach (JiggleBone simulatedPoint in _simulatedPoints) {
+			simulatedPoint.ResetBone();
+		} 
+	}
 
 }

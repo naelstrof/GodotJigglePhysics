@@ -193,26 +193,20 @@ public class JiggleBone {
 		CacheAnimationPosition(time);
 	}
 
-	public void DrawDebug(float simulated) {
-		/*Vector3 positionBlend = _currentTargetAnimatedBoneFrame.Position.Lerp(_extrapolatedPosition, simulated);
-		if (_child != null) {
-			Vector3 childPositionBlend = _child._currentTargetAnimatedBoneFrame.Position.Lerp(_child._extrapolatedPosition, simulated);
-			DebugDraw3D.DrawLine(positionBlend, childPositionBlend, Colors.Yellow);
-		}
-		if (_boneId.HasValue) {
-			DebugDraw3D.DrawLine(GlobalTransform.Origin, ParentGlobalTransform.Origin, Colors.Green);
-		}*/
-	}
+	/*public void DrawDebug(ulong time) {
+		Vector3 positionBlend = _extrapolatedPosition;
+		if (_child == null) return;
+		Vector3 childPositionBlend = _child._extrapolatedPosition;
+		Vector3 dir = (childPositionBlend - positionBlend).Normalized();
+		DebugDraw3D.DrawLine(positionBlend, childPositionBlend+dir, Colors.Yellow);
+		Vector3 dir2 = (_child._targetAnimatedBoneSignal.SamplePosition(time) - _targetAnimatedBoneSignal.SamplePosition(time)).Normalized();
+		DebugDraw3D.DrawLine(_targetAnimatedBoneSignal.SamplePosition(time), _child._targetAnimatedBoneSignal.SamplePosition(time)+dir2, Colors.Green);
+	}*/
 
 	public void ResetBone() {
 		if (_boneId.HasValue) {
 			_targetSkeleton.ResetBonePose(_boneId.Value);
 		}
-	}
-
-	public void SetBonePosition(Vector3 position) {
-		var inverseParent = (ParentGlobalTransform).Inverse();
-		_targetSkeleton.SetBonePosePosition(_boneId.Value, inverseParent * position);
 	}
 
 	public void PoseBone(float blend, ulong time) {
@@ -240,6 +234,10 @@ public class JiggleBone {
 			Quaternion animPoseToPhysicsPose = new Quaternion(localAnimatedVector.Normalized(), localSimulatedVector.Normalized());
 			Debug.Assert(_boneId != null, nameof(_boneId) + " != null");
 			_targetSkeleton.SetBonePoseRotation(_boneId.Value,animPoseToPhysicsPose*_targetSkeleton.GetBonePoseRotation(_boneId.Value));
+			// FIXME: The last bone set sometimes doesn't trigger an update. Godot bug?? This forces it to update.
+			if (_child._child == null) {
+				_targetSkeleton.GetBoneGlobalPose(_boneId.Value);
+			}
 		}
 		//if (_boneId.HasValue) {
 			//_targetSkeleton.GetBoneGlobalPose(_boneId.Value);

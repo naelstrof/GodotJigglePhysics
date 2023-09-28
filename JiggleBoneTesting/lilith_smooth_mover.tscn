@@ -1,6 +1,6 @@
 [gd_scene load_steps=13 format=3 uid="uid://du4exuw3p3c5y"]
 
-[ext_resource type="Script" path="res://SmoothMover.cs" id="1_u8p8l"]
+[ext_resource type="Script" path="res://JiggleBoneTesting/SmoothMover.cs" id="1_bur4u"]
 [ext_resource type="PackedScene" uid="uid://cg44j5qwbnmae" path="res://JiggleBoneTesting/Lilith/Lilith.glb" id="2_y2c13"]
 [ext_resource type="Script" path="res://JigglePhysics/JiggleSkeleton.cs" id="3_gfw5o"]
 [ext_resource type="Material" uid="uid://cp8ocyo8e7h23" path="res://JiggleBoneTesting/Lilith/LilithBody.tres" id="3_q6nob"]
@@ -14,13 +14,13 @@
 [ext_resource type="Script" path="res://JiggleBoneTesting/AutoWalker.cs" id="12_rix6l"]
 
 [node name="SmoothMover" type="Node3D"]
-script = ExtResource("1_u8p8l")
+script = ExtResource("1_bur4u")
 
 [node name="Lilith" parent="." instance=ExtResource("2_y2c13")]
 
 [node name="GeneralSkeleton" parent="Lilith/Armature" index="0"]
 motion_scale = 1.0
-bones/0/position = Vector3(0.00445274, 0.925494, 0.0141765)
+bones/0/position = Vector3(0.00468812, 0.974417, 0.0149259)
 bones/0/rotation = Quaternion(-0.00843417, 0.0133967, -0.0472007, 0.99876)
 bones/1/rotation = Quaternion(0.0110512, -0.010752, 0.0265516, 0.999528)
 bones/2/rotation = Quaternion(0.00647043, 0.00197262, 0.0518674, 0.998631)
@@ -51,6 +51,7 @@ bones/45/rotation = Quaternion(0.109011, 0.698653, -0.109011, 0.698653)
 bones/46/rotation = Quaternion(0.0177768, -0.62486, 0.117129, 0.771696)
 bones/47/rotation = Quaternion(0.387215, 0.00271654, 0.0374526, 0.921225)
 bones/48/rotation = Quaternion(0.19187, 0.00664724, 0.000901699, 0.981398)
+bones/49/rotation = Quaternion(0, 0, 0, 1)
 bones/50/rotation = Quaternion(0.343075, -0.00235255, 0.0369706, 0.938577)
 bones/51/rotation = Quaternion(0.154842, 0.00131421, -0.000517517, 0.987938)
 bones/52/rotation = Quaternion(-5.96046e-08, -5.96046e-08, -5.96046e-08, 1)
@@ -77,29 +78,29 @@ script = ExtResource("3_gfw5o")
 surface_material_override/0 = ExtResource("3_q6nob")
 surface_material_override/1 = ExtResource("4_5irod")
 
-[node name="JiggleRig" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="1"]
+[node name="JiggleEar_L" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="1"]
 script = ExtResource("6_s6244")
 BoneName = "      Ear.L"
 _jiggleSettings = ExtResource("7_v367e")
 
-[node name="JiggleRig2" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="2"]
+[node name="JiggleEar_R" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="2"]
 script = ExtResource("6_s6244")
 BoneName = "      Ear.R"
 _jiggleSettings = ExtResource("7_v367e")
 
-[node name="JiggleRig3" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="3"]
+[node name="JiggleTail" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="3"]
 script = ExtResource("6_s6244")
 BoneName = "  Tail1"
 _jiggleSettings = ExtResource("8_6exr5")
 
-[node name="JiggleRig4" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="4"]
-script = ExtResource("6_s6244")
-BoneName = "    Breast.L"
-_jiggleSettings = ExtResource("9_20n6b")
-
-[node name="JiggleRig5" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="5"]
+[node name="JiggleBreast_R" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="4"]
 script = ExtResource("6_s6244")
 BoneName = "    Breast.R"
+_jiggleSettings = ExtResource("9_20n6b")
+
+[node name="JiggleBreast_L" type="Node" parent="Lilith/Armature/GeneralSkeleton" index="5"]
+script = ExtResource("6_s6244")
+BoneName = "    Breast.L"
 _jiggleSettings = ExtResource("9_20n6b")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Lilith/Armature" index="1"]

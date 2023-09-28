@@ -4,8 +4,7 @@ using com.naelstrof.camera;
 
 [GlobalClass]
 public partial class CharacterController : RigidBody3D {
-	public override void _PhysicsProcess(double delta) {
-		base._PhysicsProcess(delta);
+	public static Vector3 GetWishDir() {
 		Vector3 inputDir = Vector3.Zero;
 		if (Input.IsKeyPressed(Key.W)) {
 			inputDir.Z -= 1;
@@ -19,9 +18,12 @@ public partial class CharacterController : RigidBody3D {
 		if (Input.IsKeyPressed(Key.A)) {
 			inputDir.X -= 1;
 		}
-		
-		Vector3 wishDir = new Quaternion(Vector3.Up,OrbitCamera.GetCameraAngle().Y) * inputDir;
+		return new Quaternion(Vector3.Up,OrbitCamera.GetCameraAngle().Y) * inputDir;
+	}
+	public override void _PhysicsProcess(double delta) {
+		base._PhysicsProcess(delta);
 		Vector3 velocity = LinearVelocity;
+		var wishDir = GetWishDir();
 		velocity = Friction(velocity, 9f, (float)delta);
 		velocity = Accelerate(velocity, wishDir, 8f, 11f, true, 0.1f, (float)delta);
 		LinearVelocity = velocity;
