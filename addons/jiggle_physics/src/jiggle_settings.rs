@@ -1,30 +1,5 @@
 use godot::prelude::*;
 
-pub trait JiggleSettingsBaseVirtual {
-    fn get_parameters(&self) -> JiggleSettingsData;
-}
-
-#[derive(GodotClass)]
-#[class(init,base=Resource)]
-struct JiggleSettingsBase { }
-
-
-#[godot_api]
-impl JiggleSettingsBase {}
-
-impl JiggleSettingsBaseVirtual for JiggleSettingsBase {
-    fn get_parameters(&self) -> JiggleSettingsData {
-        JiggleSettingsData {
-            gravity : 1.0,
-            friction : 0.1,
-            air_friction : 0.05,
-            blend : 1.0,
-            angle_elasticity : 0.4,
-            length_elasticity : 0.8,
-            elasticity_soften : 0.0,
-        }
-    }
-}
 
 #[derive(GodotClass,Clone)]
 #[class(init, base=Resource)]
@@ -57,11 +32,14 @@ impl JiggleSettingsData {}
 #[godot_api]
 impl ResourceVirtual for JiggleSettingsData { }
 
-impl JiggleSettingsBaseVirtual for JiggleSettingsData {
-    fn get_parameters(&self) -> JiggleSettingsData {
-        self.clone()
+fn get_jiggle_parameters(other : Option<Gd<Resource>>) -> Option<JiggleSettingsData> {
+    if let Some(other) = Gd::try_cast::<JiggleSettingsData>(other?) {
+        Some(other.bind().clone())
+    } else {
+        None
     }
 }
+
 
 impl JiggleSettingsData {
     pub fn lerp(&self, other : &Self, blend : f32) -> Self {
@@ -77,27 +55,35 @@ impl JiggleSettingsData {
     }
 }
 
-#[derive(GodotClass)]
+#[derive(GodotClass,Clone)]
 #[class(base=Resource)]
 struct JiggleSettingsBlend {
     #[export]
-    settings: Vec<Box<dyn JiggleSettingsBaseVirtual>>,
+    settings: godot::builtin::Array<Option<Gd<Resource>>>,
     #[init(default=0.0)]
     #[export(range=(0.0,1.0))]
-    blend: f32
+    blend: f32,
 }
 
 #[godot_api]
-impl JiggleSettingsBlend {}
-
-impl JiggleSettingsBaseVirtual for JiggleSettingsBlend {
-    fn get_parameters(&self) -> JiggleSettingsData {
+impl JiggleSettingsBlend {
+    fn get_data(&self) -> Option<JiggleSettingsData> {
         let settings_count_space = self.settings.len()-1;
         let target_a : usize = (self.blend.floor() as usize).clamp(0, settings_count_space);
         let target_b : usize = ((self.blend.floor()+1.0) as usize).clamp(0, settings_count_space);
         let normalized_blend_clamp : f32 = (self.blend.clamp(0.0,1.0)*(settings_count_space as f32)-(target_a as f32)).clamp(0.0,1.0);
-        let target_a : JiggleSettingsData = self.settings[target_a].get_parameters();
-        let target_b : JiggleSettingsData = self.settings[target_b].get_parameters();
-        target_a.lerp(&target_b, normalized_blend_clamp)
+        let target_a : JiggleSettingsData = get_jiggle_parameters(self.settings.get(target_a))?;
+        let target_b : JiggleSettingsData = get_jiggle_parameters(self.settings.get(target_b))?;
+        Some(target_a.lerp(&target_b, normalized_blend_clamp))
+    }
+}
+
+#[godot_api]
+impl ResourceVirtual for JiggleSettingsBlend {
+    fn init(_base: Base<Resource>) -> Self {
+        Self {
+            settings: godot::builtin::Array::new(),
+            blend: 0.0,
+        }
     }
 }
